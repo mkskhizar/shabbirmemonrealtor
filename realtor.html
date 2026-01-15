@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prime Estates - Premium Real Estate in Pakistan</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind Config for Custom Colors -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1e293b', // Slate 900
+                        accent: '#ca8a04',  // Yellow 600
+                        secondary: '#64748b', // Slate 500
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            scroll-behavior: smooth;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Hero Animation */
+        .fade-in {
+            animation: fadeIn 0.8s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Card Hover Effect */
+        .property-card {
+            transition: all 0.3s ease;
+        }
+        .property-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        /* Image hover zoom */
+        .img-container {
+            overflow: hidden;
+        }
+        .img-container img {
+            transition: transform 0.5s ease;
+        }
+        .property-card:hover .img-container img {
+            transform: scale(1.05);
+        }
+
+        /* Tab Active States */
+        .city-tab.active {
+            background-color: white;
+            color: #1e293b;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .filter-btn.active {
+            background-color: #1e293b;
+            color: white;
+        }
+        .mode-btn.active {
+            background-color: #ca8a04;
+            color: white;
+            border-color: #ca8a04;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased font-sans">
+
+    <!-- Navigation -->
+    <nav class="bg-primary text-white sticky top-0 z-50 shadow-lg">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-building-columns text-accent text-2xl"></i>
+                <span class="font-serif text-2xl font-bold tracking-wide">Prime Estates</span>
+            </div>
+            <div class="hidden md:flex space-x-8 text-sm font-medium text-slate-300">
+                <a href="#" class="hover:text-white transition">Home</a>
+                <a href="#" class="hover:text-white transition">About</a>
+                <a href="#" class="hover:text-white transition">Agents</a>
+                <a href="#" class="hover:text-white transition">Contact</a>
+            </div>
+            <button class="bg-accent hover:bg-yellow-600 text-white px-5 py-2 rounded-full font-medium transition shadow-md">
+                List Property
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative h-[500px] flex items-center justify-center overflow-hidden">
+        <!-- Background Image (Dynamic based on city) -->
+        <div id="hero-bg" class="absolute inset-0 z-0">
+            <img src="https://images.unsplash.com/photo-1580674285054-bed31e145f59?auto=format&fit=crop&q=80&w=2070" 
+                 class="w-full h-full object-cover transition-opacity duration-700 brightness-50" 
+                 alt="Real Estate Background">
+        </div>
+
+        <!-- Content -->
+        <div class="relative z-10 text-center px-4 fade-in">
+            <h1 class="text-4xl md:text-6xl font-serif font-bold text-white mb-4 shadow-sm">
+                Find Your Dream Space in <span id="hero-city-name" class="text-accent">Karachi</span>
+            </h1>
+            <p class="text-lg text-slate-200 mb-8 max-w-2xl mx-auto">
+                Premium properties for commercial, residential, and investment needs.
+            </p>
+
+            <!-- City Toggle Tabs -->
+            <div class="inline-flex bg-white/20 backdrop-blur-md p-2 rounded-full border border-white/30">
+                <button onclick="switchCity('Karachi')" id="tab-karachi" class="city-tab active px-8 py-3 rounded-full text-white font-semibold transition-all duration-300">
+                    Karachi
+                </button>
+                <button onclick="switchCity('Islamabad')" id="tab-islamabad" class="city-tab px-8 py-3 rounded-full text-white font-semibold transition-all duration-300">
+                    Islamabad
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-12">
+        
+        <!-- Controls / Filters -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-6 bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+            
+            <!-- Sale / Rent Toggle -->
+            <div class="flex rounded-lg overflow-hidden border border-slate-200">
+                <button onclick="setMode('sale')" id="mode-sale" class="mode-btn active px-6 py-2 font-medium bg-slate-50 text-slate-600 hover:bg-slate-100 transition">
+                    For Sale
+                </button>
+                <button onclick="setMode('rent')" id="mode-rent" class="mode-btn px-6 py-2 font-medium bg-slate-50 text-slate-600 hover:bg-slate-100 transition">
+                    For Rent
+                </button>
+            </div>
+
+            <!-- Property Type Filters -->
+            <div class="flex flex-wrap gap-2 justify-center">
+                <button onclick="setCategory('all')" id="cat-all" class="filter-btn active px-4 py-2 rounded-lg text-sm font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition">
+                    All
+                </button>
+                <button onclick="setCategory('house')" id="cat-house" class="filter-btn px-4 py-2 rounded-lg text-sm font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition">
+                    <i class="fa-solid fa-house mr-2"></i>Houses
+                </button>
+                <button onclick="setCategory('apartment')" id="cat-apartment" class="filter-btn px-4 py-2 rounded-lg text-sm font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition">
+                    <i class="fa-regular fa-building mr-2"></i>Apartments
+                </button>
+                <button onclick="setCategory('commercial')" id="cat-commercial" class="filter-btn px-4 py-2 rounded-lg text-sm font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition">
+                    <i class="fa-solid fa-briefcase mr-2"></i>Commercial
+                </button>
+            </div>
+        </div>
+
+        <!-- Dynamic Title -->
+        <div class="mb-8 flex justify-between items-end border-b border-slate-200 pb-4">
+            <div>
+                <h2 class="text-3xl font-serif font-bold text-primary" id="listing-title">Properties for Sale in Karachi</h2>
+                <p class="text-slate-500 mt-1" id="listing-count">Showing available properties</p>
+            </div>
+        </div>
+
+        <!-- Property Grid -->
+        <div id="property-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Cards will be injected here via JS -->
+        </div>
+
+        <!-- Empty State (Hidden by default) -->
+        <div id="empty-state" class="hidden text-center py-20">
+            <i class="fa-regular fa-folder-open text-6xl text-slate-300 mb-4"></i>
+            <h3 class="text-xl font-semibold text-slate-600">No properties found</h3>
+            <p class="text-slate-400">Try adjusting your filters.</p>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-primary text-white pt-16 pb-8 mt-12">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                <div>
+                    <div class="flex items-center gap-2 mb-6">
+                        <i class="fa-solid fa-building-columns text-accent text-2xl"></i>
+                        <span class="font-serif text-2xl font-bold">Prime Estates</span>
+                    </div>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        Connecting you with the finest properties in Karachi and Islamabad. Your trusted partner in real estate excellence.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-6">Quick Links</h4>
+                    <ul class="space-y-3 text-slate-400 text-sm">
+                        <li><a href="#" class="hover:text-accent transition">Karachi Properties</a></li>
+                        <li><a href="#" class="hover:text-accent transition">Islamabad Properties</a></li>
+                        <li><a href="#" class="hover:text-accent transition">Commercial Projects</a></li>
+                        <li><a href="#" class="hover:text-accent transition">Investment Guide</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-6">Contact Us</h4>
+                    <ul class="space-y-3 text-slate-400 text-sm">
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-location-dot mt-1 text-accent"></i>
+                            <span>Main Shahrah-e-Faisal, Karachi<br>Blue Area, Islamabad</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fa-solid fa-phone text-accent"></i>
+                            <span>+92 300 1234567</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fa-solid fa-envelope text-accent"></i>
+                            <span>info@primeestates.pk</span>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-6">Newsletter</h4>
+                    <form class="flex flex-col gap-3">
+                        <input type="email" placeholder="Your Email Address" class="bg-slate-800 border border-slate-700 text-white px-4 py-2 rounded focus:outline-none focus:border-accent">
+                        <button class="bg-accent hover:bg-yellow-600 text-white px-4 py-2 rounded font-medium transition">
+                            Subscribe
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <div class="border-t border-slate-800 pt-8 text-center text-slate-500 text-sm">
+                &copy; 2023 Prime Estates. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- Mock Data ---
+        const properties = [
+            // KARACHI - SALE
+            {
+                id: 1, city: 'Karachi', mode: 'sale', type: 'house',
+                title: 'Luxury DHA Bungalow',
+                location: 'DHA Phase 8, Karachi',
+                price: 'PKR 12.5 Crore',
+                beds: 5, baths: 6, area: '500 Sq. Yd',
+                image: 'https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&q=80&w=800'
+            },
+            {
+                id: 2, city: 'Karachi', mode: 'sale', type: 'apartment',
+                title: 'Emaar Sea View Apartment',
+                location: 'Clifton, Karachi',
+                price: 'PKR 6.5 Crore',
+                beds: 3, baths: 3, area: '2200 Sq. Ft',
+                image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&q=80&w=800'
+            },
+            {
+                id: 3, city: 'Karachi', mode: 'sale', type: 'commercial',
+                title: 'Prime Office Space',
+                location: 'I.I. Chundrigar Road, Karachi',
+                price: 'PKR 4.0 Crore',
+                beds: 0, baths: 2, area: '1500 Sq. Ft',
+                image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=800'
+            },
+            
+            // KARACHI - RENT
+            {
+                id: 4, city: 'Karachi', mode: 'rent', type: 'house',
+                title: 'Modern Villa',
+                location: 'Bahria Town, Karachi',
+                price: 'PKR 150,000 /mo',
+                beds: 4, baths: 4, area: '250 Sq. Yd',
+                image: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&q=80&w=800'
+            },
+            {
+                id: 5, city: 'Karachi', mode: 'rent', type: 'apartment',
+                title: 'Creek Vista Apartment',
+                location: 'DHA Phase 8, Karachi',
+                price: 'PKR 250,000 /mo',
+                beds: 3, baths: 4, area: '2800 Sq. Ft',
+                image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=800'
+            },
+            {
+                id: 6, city: 'Karachi', mode: 'rent', type: 'commercial',
+                title: 'Showroom Space',
+                location: 'Tariq Road, Karachi',
+                price: 'PKR 500,000 /mo',
+                beds: 0, baths: 1, area: '1200 Sq. Ft',
+                image: 'https://images.unsplash.com/photo-1572916172671-507e112d83b5?auto=format&fit=crop&q=80&w=800'
+            },
+
+            // ISLAMABAD - SALE
+            {
+                id: 7, city: 'Islamabad', mode: 'sale', type: 'house',
+                title: 'Hillside Modern Mansion',
+                location: 'E-7, Islamabad',
+                price: 'PKR 45.0 Crore',
+                beds: 7, baths: 8, area: '2 Kanal',
+                image: 'https://images.unsplash.com/photo-1600596542815-60c37c6525fa?auto=format&fit=crop&q=80&w=800'
+            },
+            {
+                id: 8, city: 'Islamabad', mode: 'sale', type: 'apartment',
+                title: 'Centaurus Residencia',
+                location: 'F-8, Islamabad',
+                price: 'PKR 8.5 Crore',
+                beds: 2, baths: 2, area: '1800 Sq. Ft',
+                image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=800'
+            },
+            {
+                id: 9, city: 'Islamabad', mode: 'sale', type: 'commercial',
+                title: 'Blue Area Corporate Floor',
+                location: 'Blue Area, Islamabad',
+                price: 'PKR 15.0 Crore',
+                beds: 0, baths: 4, area: '4000 Sq. Ft',
+                image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=800'
+            },
+
+            // ISLAMABAD - RENT
+            {
+                id: 10, city: 'Islamabad', mode: 'rent', type: 'house',
+                title: 'Farmhouse Retreat',
+                location: 'Chak Shahzad, Islamabad',
+                price: 'PKR 800,000 /mo',
+                beds: 6, baths: 7, area: '4 Kanal',
+                image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&q=80&w=800'
+            },
+            {
+                id: 11, city: 'Islamabad', mode: 'rent', type: 'apartment',
+                title: 'One Constitution Avenue',
+                location: 'Constitution Ave, Islamabad',
+                price: 'PKR 350,000 /mo',
+                beds: 3, baths: 3, area: '2400 Sq. Ft',
+                image: 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&q=80&w=800'
+            },
+            {
+                id: 12, city: 'Islamabad', mode: 'rent', type: 'commercial',
+                title: 'Co-working Space',
+                location: 'G-10 Markaz, Islamabad',
+                price: 'PKR 120,000 /mo',
+                beds: 0, baths: 1, area: '800 Sq. Ft',
+                image: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&q=80&w=800'
+            }
+        ];
+
+        // --- Application State ---
+        let state = {
+            city: 'Karachi',
+            mode: 'sale',
+            category: 'all'
+        };
+
+        // --- Functions ---
+
+        function switchCity(cityName) {
+            state.city = cityName;
+            
+            // Update UI Tabs
+            document.querySelectorAll('.city-tab').forEach(el => {
+                el.classList.remove('active', 'bg-white', 'text-slate-900', 'shadow-md');
+                el.classList.add('text-white');
+            });
+            const activeTab = document.getElementById(`tab-${cityName.toLowerCase()}`);
+            activeTab.classList.add('active');
+            activeTab.classList.remove('text-white');
+
+            // Update Hero BG & Text
+            const heroBg = document.getElementById('hero-bg').querySelector('img');
+            const cityText = document.getElementById('hero-city-name');
+            
+            cityText.textContent = cityName;
+            
+            if (cityName === 'Karachi') {
+                heroBg.src = "https://images.unsplash.com/photo-1580674285054-bed31e145f59?auto=format&fit=crop&q=80&w=2070";
+            } else {
+                heroBg.src = "https://images.unsplash.com/photo-1589406733276-857e490bc1b9?auto=format&fit=crop&q=80&w=2070"; // Generic nature/mosque vibe
+            }
+
+            renderProperties();
+        }
+
+        function setMode(mode) {
+            state.mode = mode;
+            
+            // Update UI
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-accent', 'text-white', 'border-accent');
+                btn.classList.add('bg-slate-50', 'text-slate-600');
+            });
+            const activeBtn = document.getElementById(`mode-${mode}`);
+            activeBtn.classList.remove('bg-slate-50', 'text-slate-600');
+            activeBtn.classList.add('active');
+
+            renderProperties();
+        }
+
+        function setCategory(cat) {
+            state.category = cat;
+
+            // Update UI
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`cat-${cat}`).classList.add('active');
+
+            renderProperties();
+        }
+
+        function renderProperties() {
+            const grid = document.getElementById('property-grid');
+            const title = document.getElementById('listing-title');
+            const countLabel = document.getElementById('listing-count');
+            const emptyState = document.getElementById('empty-state');
+
+            // Filter logic
+            const filtered = properties.filter(p => {
+                return p.city === state.city && 
+                       p.mode === state.mode && 
+                       (state.category === 'all' || p.type === state.category);
+            });
+
+            // Update Title
+            const modeText = state.mode === 'sale' ? 'Sale' : 'Rent';
+            title.textContent = `${state.category === 'all' ? 'Properties' : capitalize(state.category) + 's'} for ${modeText} in ${state.city}`;
+            countLabel.textContent = `${filtered.length} listings found`;
+
+            // Clear Grid
+            grid.innerHTML = '';
+
+            if (filtered.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            // Generate Cards
+            filtered.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'property-card bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden group';
+                
+                // Badges
+                const typeBadgeColor = p.type === 'commercial' ? 'bg-blue-600' : (p.type === 'house' ? 'bg-emerald-600' : 'bg-purple-600');
+                
+                // Bed/Bath HTML (Hide for commercial if 0)
+                let featuresHtml = '';
+                if(p.type !== 'commercial') {
+                    featuresHtml = `
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-bed text-slate-400"></i>
+                            <span class="text-sm font-medium">${p.beds}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-bath text-slate-400"></i>
+                            <span class="text-sm font-medium">${p.baths}</span>
+                        </div>
+                    `;
+                } else {
+                    featuresHtml = `
+                         <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-layer-group text-slate-400"></i>
+                            <span class="text-sm font-medium">Floor 2</span>
+                        </div>
+                    `;
+                }
+
+                card.innerHTML = `
+                    <div class="img-container relative h-64">
+                        <img src="${p.image}" alt="${p.title}" class="w-full h-full object-cover">
+                        <div class="absolute top-4 left-4 flex gap-2">
+                            <span class="${typeBadgeColor} text-white text-xs font-bold px-3 py-1 rounded uppercase tracking-wider shadow-sm">${p.type}</span>
+                            <span class="bg-slate-900 text-white text-xs font-bold px-3 py-1 rounded uppercase tracking-wider shadow-sm">For ${p.mode}</span>
+                        </div>
+                        <div class="absolute bottom-4 right-4">
+                             <span class="bg-white/90 backdrop-blur text-primary font-bold px-4 py-2 rounded shadow-lg">
+                                ${p.price}
+                             </span>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-slate-800 group-hover:text-accent transition-colors truncate">${p.title}</h3>
+                        </div>
+                        <p class="text-slate-500 text-sm mb-4 flex items-center gap-1">
+                            <i class="fa-solid fa-location-dot text-accent"></i> ${p.location}
+                        </p>
+                        <div class="flex items-center gap-6 py-4 border-t border-slate-100 text-slate-600">
+                            ${featuresHtml}
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-ruler-combined text-slate-400"></i>
+                                <span class="text-sm font-medium">${p.area}</span>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex gap-2">
+                            <button class="flex-1 bg-primary text-white py-2 rounded hover:bg-slate-800 transition font-medium">View Details</button>
+                            <button class="px-3 py-2 border border-slate-200 rounded hover:bg-slate-50 text-slate-600 transition">
+                                <i class="fa-regular fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function capitalize(s) {
+            return s && s[0].toUpperCase() + s.slice(1);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProperties();
+        });
+
+    </script>
+</body>
+</html>
